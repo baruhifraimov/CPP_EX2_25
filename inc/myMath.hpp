@@ -1,6 +1,6 @@
 #pragma once
 
-namespace mmath{
+namespace mtrx{
 	/**
 	 * @brief n1**n2 thats it.
 	 * 

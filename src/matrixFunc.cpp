@@ -1,10 +1,13 @@
 #include <iostream>
 #include <stdexcept>
-#include "../inc/matrix_func.hpp"
-#include "../inc/my_math.hpp"
+#include "../inc/matrixFunc.hpp"
+#include "../inc/myMath.hpp"
 
 namespace mtrx{
 	Matrix::Matrix(int size){
+		if(size <= 0){
+			throw(std::length_error("Negative (or zero) value will not be tolerated!"));
+		}
 		this->size = size;
 		mat_table = new double*[size];
 		for (int i = 0; i < size; i++)
@@ -22,6 +25,9 @@ namespace mtrx{
 	}
 
 	Matrix::Matrix(double** matrix, int size){
+		if(size <= 0){
+			throw(std::length_error("Negative (or zero) value will not be tolerated!"));
+		}
 		this->size = size;
 		mat_table = new double*[size];
 		for (int i = 0; i < size; i++)
@@ -65,16 +71,30 @@ namespace mtrx{
 			delete[] mat_table[i];
 		}
 		delete[] mat_table;
+		}
 	}
-}
 
-	// Assignment operator
+	// ~m1 (Transpose)
+	Matrix Matrix::operator~(){
+		Matrix m(size);
+		for (int i = 0; i < size; i++)
+		{
+			for (int j = 0; j < size; j++)
+		{
+			m.mat_table[i][j] = this->mat_table[j][i];
+		}
+		}
+		return m;
+	}
+
+
+	// m1 = m2
 	Matrix& Matrix::operator=(const Matrix& o) {
 		if (this == &o) {
-			return *this; // Self-assignment check
+			return *this; // are we the same? then dont do nothing.
 		}
 		
-		// Clean up existing resources
+		// Clean up existing fields (to free up unreachable memmory)
 		if (mat_table != nullptr) {
 			for (int i = 0; i < size; i++) {
 				delete[] mat_table[i];
@@ -133,7 +153,7 @@ namespace mtrx{
 			throw std::invalid_argument("Matrix sizes do not match");
 		}
 		Matrix m(size);
-		int curr_result =0;
+		double curr_result =0;
 		for (int i = 0; i < size; i++)
 		{
 			for (int j = 0; j < size; j++)
@@ -205,14 +225,12 @@ namespace mtrx{
 	}
 
 	// m1^<num>
-	Matrix Matrix::operator^(double num) const{
+	Matrix Matrix::operator^(int num) const{
 		Matrix m(size);
-		for (int i = 0; i < size; i++)
+		m = *this;
+		for (int i = 1; i < num; i++)
 		{
-			for (int j = 0; j < size; j++)
-		{
-			m.mat_table[i][j] = mmath::mpow(this->mat_table[i][j],num);
-		}
+			m*=m;
 		}
 		return m;
 	}
@@ -297,11 +315,11 @@ namespace mtrx{
 	}
 
 	// m1[]
-	double* Matrix::operator[](int index){
-		if(index >= this->size){
-			throw std::out_of_range("Index out of matrix bounds");
+	Matrix::HiddenArr Matrix::operator[](int index){
+		if (index < 0 || index >= size) {
+			throw std::out_of_range("Index is out of bounds");
 		}
-		return this->mat_table[index];
+		return HiddenArr(mat_table[index], size);
 	}
 
 	// m1 == m2

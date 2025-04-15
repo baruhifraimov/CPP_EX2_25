@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include "../inc/my_math.hpp"
+#include "../inc/myMath.hpp"
 
-namespace mmath{
+namespace mtrx{
 	double mpow(double n1, double n2){
 		double result =0;
 		for (int i = 0; i < n2; i++)

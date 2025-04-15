@@ -4,30 +4,39 @@ OBJ = ./obj/
 SRC = ./src/
 INC = ./inc/
 
-all: Main
+all: mmain mtest
 
-
-Main: $(OBJ)main.o $(OBJ)matrix_func.o $(OBJ)my_math.o
-	mkdir -p $(OBJ)
-	$(CXX) $(CXXFLAGS) $^ -o $@
+Main: mmain
 	./Main
 
-$(OBJ)main.o: $(SRC)main.cpp $(INC)matrix_func.hpp $(INC)my_math.hpp
+test: mtest
+	./matxTest
+
+mmain: $(OBJ)main.o $(OBJ)matrixFunc.o $(OBJ)myMath.o
+	mkdir -p $(OBJ)
+	$(CXX) $(CXXFLAGS) $^ -o Main
+
+$(OBJ)main.o: $(SRC)main.cpp $(INC)matrixFunc.hpp $(INC)myMath.hpp
 	mkdir -p $(OBJ)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(OBJ)matrix_func.o: $(SRC)matrix_func.cpp $(INC)matrix_func.hpp $(INC)my_math.hpp
+$(OBJ)matrixFunc.o: $(SRC)matrixFunc.cpp $(INC)matrixFunc.hpp $(INC)myMath.hpp
 	mkdir -p $(OBJ)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(OBJ)my_math.o: $(SRC)my_math.cpp $(INC)my_math.hpp
+$(OBJ)myMath.o: $(SRC)myMath.cpp $(INC)myMath.hpp
 	mkdir -p $(OBJ)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-.PHONY: clean valgrind test all
+# New testing rules
+$(OBJ)matxTest.o: $(SRC)matxTest.cpp $(INC)doctest.h $(INC)matrixFunc.hpp $(INC)myMath.hpp
+	mkdir -p $(OBJ)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-test:
-	@echo "Need to be implemented"
+mtest: $(OBJ)matxTest.o $(OBJ)matrixFunc.o $(OBJ)myMath.o
+	$(CXX) $(CXXFLAGS) $^ -o matxTest
+
+.PHONY: Main test valgrind clean all
 
 #make sure to run 'ulimit -n 1024' before running valgrind, thank you
 #
@@ -39,8 +48,7 @@ test:
 #			for memory errors. Consider turning off if Valgrind is unacceptably slow.
 #
 valgrind:
-	sudo ulimit -n 1024
 	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./Main
 
 clean:
-	rm -rf *.o Main core.* $(OBJ)
+	rm -rf Main matxTest $(OBJ)
