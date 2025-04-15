@@ -1,71 +1,15 @@
+// baruh.ifraimov@gmail.com
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "../inc/doctest.h"
-#include "../inc/matrixFunc.hpp"
+#include "../inc/SquareMat.hpp"
 #include <iostream>
 
 using namespace mtrx;
 
-/*
-================== 🧪 DOCTEST CHEAT SHEET ==================
 
-✅ Structure:
-------------------------------------------------------------
-TEST_CASE("description") {
-    // Arrange
-    // Act
-    // Assert
-
-    SUBCASE("Addition") {
-        CHECK(A + B == expected);
-    }
-}
-
-✅ Basic Assertions:
-------------------------------------------------------------
-CHECK(expr);               // Check if true, keep going on failure
-REQUIRE(expr);             // Check if true, STOP on failure
-
-CHECK_EQ(a, b);            // a == b
-REQUIRE_EQ(a, b);          // a == b, stop on failure
-
-CHECK_NE(a, b);            // a != b
-CHECK_LT(a, b);            // a < b
-CHECK_GT(a, b);            // a > b
-CHECK_LE(a, b);            // a <= b
-CHECK_GE(a, b);            // a >= b
-
-✅ Floating Point (with tolerance):
-------------------------------------------------------------
-CHECK(doctest::Approx(a) == b); // a ≈ b
-
-✅ Exceptions:
-------------------------------------------------------------
-CHECK_THROWS(expr);                   // Any exception
-CHECK_THROWS_AS(expr, ExcType);       // Specific exception
-CHECK_NOTHROW(expr);                  // Should NOT throw
-
-✅ Subsections (like nested tests):
-------------------------------------------------------------
-TEST_CASE("Matrix arithmetic") {
-    SUBCASE("Addition") {
-        ...
-    }
-    SUBCASE("Multiplication") {
-        ...
-    }
-}
-
-✅ Test Setup:
-------------------------------------------------------------
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include "doctest.h"
-
-=============================================================
-*/
-
-TEST_CASE("Matrix Class Tests") {
+TEST_CASE("SquareMat Class Tests") {
     // Initializing matrices
-    Matrix m1(2), m2(2), m3(3), m4(2);
+    SquareMat m1(2), m2(2), m3(3), m4(2);
 
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 2; j++) {
@@ -79,11 +23,16 @@ TEST_CASE("Matrix Class Tests") {
         }
     }
 
-    // Copy constructor
     m4 = m2;
 
-    // std::cout << "M1: "<< m1 << "\n"<< "M2: "<<m2  << "\n"<<"M3: "<< m3  << "\n"<<"M4: "<< m4 << std::endl;
+    SUBCASE("Creating SquareMat with null array") {
+        double** null_arr = nullptr;
+        CHECK_THROWS_AS(SquareMat a(null_arr, 2), std::invalid_argument);
+    }
 
+    SUBCASE("Equality (==)") {
+        CHECK_EQ(m4, m2);
+    }
 
     SUBCASE("Equality (==)") {
         CHECK_EQ(m4, m2);
@@ -96,7 +45,7 @@ TEST_CASE("Matrix Class Tests") {
 
     // also here
     SUBCASE("Addition (m1 + m2)") {
-        Matrix result = m1 + m2;
+        SquareMat result = m1 + m2;
         CHECK(doctest::Approx(result[0][0]) == 0.0);
         CHECK(doctest::Approx(result[0][1]) == 2.3);
         CHECK(doctest::Approx(result[1][0]) == 1.0);
@@ -105,7 +54,7 @@ TEST_CASE("Matrix Class Tests") {
 
     // something here is wrong?
     SUBCASE("Multiplication (m1 * m2)") {
-        Matrix result = m1 * m2;
+        SquareMat result = m1 * m2;
         CHECK(doctest::Approx(result[0][0]) == 0.0);
         CHECK(doctest::Approx(result[0][1]) == 2.3);
         CHECK(doctest::Approx(result[1][0]) == 0.0);
@@ -113,7 +62,7 @@ TEST_CASE("Matrix Class Tests") {
     }
 
     SUBCASE("Determinant (!m1)") {
-        Matrix a(2);
+        SquareMat a(2);
         a[0][0] = 1;
         a[0][1] = 2;
         a[1][0] = 3;
@@ -151,7 +100,7 @@ TEST_CASE("Matrix Class Tests") {
     }
 
     SUBCASE("Substitution (m1 - m2))"){
-        Matrix result = m1 - m2;
+        SquareMat result = m1 - m2;
         CHECK(doctest::Approx(result[0][0]) == 0);
         CHECK(doctest::Approx(result[0][1]) == (double)-3/10);
         CHECK(doctest::Approx(result[1][0]) == 1);
@@ -159,7 +108,7 @@ TEST_CASE("Matrix Class Tests") {
     }
 
     SUBCASE("Unary minus (-m1))"){
-        Matrix result = -m1;
+        SquareMat result = -m1;
         CHECK(doctest::Approx(result[0][0]) == 0);
         CHECK(doctest::Approx(result[0][1]) == -1);
         CHECK(doctest::Approx(result[1][0]) == -1);
@@ -167,7 +116,7 @@ TEST_CASE("Matrix Class Tests") {
     }
 
     SUBCASE("Scalar multiplication (m1*scalar))"){
-        Matrix result = m1*2;
+        SquareMat result = m1*2;
         CHECK(doctest::Approx(result[0][0]) == 0);
         CHECK(doctest::Approx(result[0][1]) == 2);
         CHECK(doctest::Approx(result[1][0]) == 2);
@@ -175,7 +124,7 @@ TEST_CASE("Matrix Class Tests") {
     }
 
     SUBCASE("Scalar multiplication (scalar*m1))"){
-        Matrix result = m1*2;
+        SquareMat result = m1*2;
         CHECK(doctest::Approx(result[0][0]) == 0);
         CHECK(doctest::Approx(result[0][1]) == 2);
         CHECK(doctest::Approx(result[1][0]) == 2);
@@ -183,7 +132,7 @@ TEST_CASE("Matrix Class Tests") {
     }
 
     SUBCASE("Scalar division (m1/scalar))"){
-        Matrix result = m1/3;
+        SquareMat result = m1/3;
         CHECK(doctest::Approx(result[0][0]) == 0);
         CHECK(doctest::Approx(result[0][1]) == (double)1/3);
         CHECK(doctest::Approx(result[1][0]) == (double)1/3);
@@ -194,15 +143,15 @@ TEST_CASE("Matrix Class Tests") {
     m4*=13.2;
     m4[0][0] = 12;
     SUBCASE("Modulo with scalar (m1&scalar))"){
-        Matrix result = m4%2;
+        SquareMat result = m4%2;
         CHECK(doctest::Approx(result[0][0]) == 0);
         CHECK(doctest::Approx(result[0][1]) == 1);
         CHECK(doctest::Approx(result[1][0]) == 0);
         CHECK(doctest::Approx(result[1][1]) == 0);
     }
 
-    SUBCASE("Power Matrix (multiply it by num times) (m2^2))"){
-        Matrix result = m2^2;
+    SUBCASE("Power SquareMat (multiply it by num times) (m2^2))"){
+        SquareMat result = m2^2;
         CHECK(doctest::Approx(result[0][0]) == 0);
         CHECK(doctest::Approx(result[0][1]) == (double)299/100);
         CHECK(doctest::Approx(result[1][0]) == 0);
@@ -210,15 +159,15 @@ TEST_CASE("Matrix Class Tests") {
     }
 
     SUBCASE("Greater than or equal (m1 >= m2)") {
-        Matrix a(2);
+        SquareMat a(2);
         a[0][0] = 5; a[0][1] = 5;
         a[1][0] = 5; a[1][1] = 5; // Sum: 20
         
-        Matrix b(2);
+        SquareMat b(2);
         b[0][0] = 1; b[0][1] = 2;
         b[1][0] = 3; b[1][1] = 4; // Sum: 10
         
-        Matrix c(2);
+        SquareMat c(2);
         c[0][0] = 8; c[0][1] = 4;
         c[1][0] = 4; c[1][1] = 4; // Sum: 20
         
@@ -228,15 +177,15 @@ TEST_CASE("Matrix Class Tests") {
     }
 
     SUBCASE("Less than or equal (m1 <= m2)") {
-        Matrix a(2);
+        SquareMat a(2);
         a[0][0] = 1; a[0][1] = 2;
         a[1][0] = 3; a[1][1] = 4; // Sum: 10
         
-        Matrix b(2);
+        SquareMat b(2);
         b[0][0] = 5; b[0][1] = 5;
         b[1][0] = 5; b[1][1] = 5; // Sum: 20
         
-        Matrix c(2);
+        SquareMat c(2);
         c[0][0] = 3; c[0][1] = 3;
         c[1][0] = 2; c[1][1] = 2; // Sum: 10
         
@@ -247,11 +196,11 @@ TEST_CASE("Matrix Class Tests") {
 
     SUBCASE("Greater than (m1 > m2)") {
         // Create matrices with specific sums to test > operator
-        Matrix a(2);
+        SquareMat a(2);
         a[0][0] = 3; a[0][1] = 3;
         a[1][0] = 3; a[1][1] = 3; // Sum: 12
         
-        Matrix b(2);
+        SquareMat b(2);
         b[0][0] = 2; b[0][1] = 2;
         b[1][0] = 2; b[1][1] = 2; // Sum: 8
         
@@ -261,11 +210,11 @@ TEST_CASE("Matrix Class Tests") {
     }
 
     SUBCASE("Less than (m1 < m2)") {
-        Matrix a(2);
+        SquareMat a(2);
         a[0][0] = 2; a[0][1] = 2;
         a[1][0] = 2; a[1][1] = 2; // Sum: 8
         
-        Matrix b(2);
+        SquareMat b(2);
         b[0][0] = 3; b[0][1] = 3;
         b[1][0] = 3; b[1][1] = 3; // Sum: 12
         
@@ -275,7 +224,7 @@ TEST_CASE("Matrix Class Tests") {
     }
 
     SUBCASE("Transpose (~m1)") {
-        Matrix result = ~m1;
+        SquareMat result = ~m1;
         
         CHECK_EQ(result[0][0], m1[0][0]);
         CHECK_EQ(result[0][1], m1[1][0]);
@@ -284,8 +233,8 @@ TEST_CASE("Matrix Class Tests") {
     }
 
     SUBCASE("Post-increment (m1++)") {
-        Matrix a = m1;
-        Matrix before = a++;
+        SquareMat a = m1;
+        SquareMat before = a++;
         
         CHECK_EQ(before[0][0], m1[0][0]);
         CHECK_EQ(before[0][1], m1[0][1]);
@@ -299,8 +248,8 @@ TEST_CASE("Matrix Class Tests") {
     }
 
     SUBCASE("Pre-increment (++m1)") {
-        Matrix a = m1;
-        Matrix& result = ++a;
+        SquareMat a = m1;
+        SquareMat& result = ++a;
         
         CHECK_EQ(&result, &a);
         
@@ -311,8 +260,8 @@ TEST_CASE("Matrix Class Tests") {
     }
 
     SUBCASE("Post-decrement (m1--)") {
-        Matrix a = m1;
-        Matrix before = a--;
+        SquareMat a = m1;
+        SquareMat before = a--;
         
         CHECK_EQ(before[0][0], m1[0][0]);
         CHECK_EQ(before[0][1], m1[0][1]);
@@ -326,8 +275,8 @@ TEST_CASE("Matrix Class Tests") {
     }
 
     SUBCASE("Pre-decrement (--m1)") {
-        Matrix a = m1;
-        Matrix& result = --a;
+        SquareMat a = m1;
+        SquareMat& result = --a;
         
         CHECK_EQ(&result, &a);
         
@@ -337,11 +286,11 @@ TEST_CASE("Matrix Class Tests") {
         CHECK_EQ(a[1][1], m1[1][1] - 1);
     }
 
-    SUBCASE("Compound Addition (m1 += m2)") {
-        Matrix a = m1;
-        Matrix b = m2;
+    SUBCASE(" Addition (m1 += m2)") {
+        SquareMat a = m1;
+        SquareMat b = m2;
         
-        Matrix expected = m1 + m2;
+        SquareMat expected = m1 + m2;
         
         a += b;
         
@@ -351,11 +300,11 @@ TEST_CASE("Matrix Class Tests") {
         CHECK(doctest::Approx(a[1][1]) == expected[1][1]);
     }
 
-    SUBCASE("Compound Subtraction (m1 -= m2)") {
-        Matrix a = m1;
-        Matrix b = m2;
+    SUBCASE(" Subtraction (m1 -= m2)") {
+        SquareMat a = m1;
+        SquareMat b = m2;
         
-        Matrix expected = m1 - m2;
+        SquareMat expected = m1 - m2;
         
         a -= b;
         
@@ -365,11 +314,11 @@ TEST_CASE("Matrix Class Tests") {
         CHECK(doctest::Approx(a[1][1]) == expected[1][1]);
     }
 
-    SUBCASE("Compound Multiplication (m1 *= m2)") {
-        Matrix a = m1;
-        Matrix b = m2;
+    SUBCASE(" Multiplication (m1 *= m2)") {
+        SquareMat a = m1;
+        SquareMat b = m2;
         
-        Matrix expected = m1 * m2;
+        SquareMat expected = m1 * m2;
         
         a *= b;
         
@@ -379,11 +328,11 @@ TEST_CASE("Matrix Class Tests") {
         CHECK(doctest::Approx(a[1][1]) == expected[1][1]);
     }
 
-    SUBCASE("Compound Scalar Multiplication (m1 *= num)") {
-        Matrix a = m1;
+    SUBCASE(" Scalar Multiplication (m1 *= num)") {
+        SquareMat a = m1;
         double num = 3.5;
         
-        Matrix expected = m1 * num;
+        SquareMat expected = m1 * num;
         
         a *= num;
         
@@ -393,11 +342,11 @@ TEST_CASE("Matrix Class Tests") {
         CHECK(doctest::Approx(a[1][1]) == expected[1][1]);
     }
 
-    SUBCASE("Compound Scalar Division (m1 /= num)") {
-        Matrix a = m1;
+    SUBCASE(" Scalar Division (m1 /= num)") {
+        SquareMat a = m1;
         double num = 2.5;
         
-        Matrix expected = m1 / num;
+        SquareMat expected = m1 / num;
         
         a /= num;
         
@@ -407,22 +356,22 @@ TEST_CASE("Matrix Class Tests") {
         CHECK(doctest::Approx(a[1][1]) == expected[1][1]);
     }
 
-    SUBCASE("Compound Scalar Division - Exception (m1 /= 0)") {
-        Matrix a = m1;
+    SUBCASE(" Scalar Division - Exception (m1 /= 0)") {
+        SquareMat a = m1;
         
         CHECK_THROWS(a /= 0);
     }
 
-    SUBCASE("Compound Modulo with Matrix (m1 %= m2)") {
-        Matrix a(2);
+    SUBCASE(" Modulo with SquareMat (m1 %= m2)") {
+        SquareMat a(2);
         a[0][0] = 5; a[0][1] = 7;
         a[1][0] = 9; a[1][1] = 11;
         
-        Matrix b(2);
+        SquareMat b(2);
         b[0][0] = 2; b[0][1] = 3;
         b[1][0] = 4; b[1][1] = 5;
         
-        Matrix expected = a % b;
+        SquareMat expected = a % b;
         
         a %= b;
         
@@ -432,14 +381,14 @@ TEST_CASE("Matrix Class Tests") {
         CHECK_EQ(a[1][1], expected[1][1]);
     }
 
-    SUBCASE("Compound Modulo with Scalar (m1 %= num)") {
-        Matrix a(2);
+    SUBCASE(" Modulo with Scalar (m1 %= num)") {
+        SquareMat a(2);
         a[0][0] = 5; a[0][1] = 7;
         a[1][0] = 9; a[1][1] = 11;
         
         int num = 3;
         
-        Matrix expected = a % num;
+        SquareMat expected = a % num;
         
         a %= num;
         
@@ -448,10 +397,10 @@ TEST_CASE("Matrix Class Tests") {
         CHECK_EQ(a[1][0], expected[1][0]);
         CHECK_EQ(a[1][1], expected[1][1]);
     }
-    SUBCASE("Trying to create a matrix with <=0 size")
+    SUBCASE("Trying to create a SquareMat with <=0 size")
     {
-        CHECK_THROWS_AS(Matrix a(-1),std::length_error);
-        CHECK_THROWS_AS(Matrix a(0),std::length_error);
+        CHECK_THROWS_AS(SquareMat a(-1),std::length_error);
+        CHECK_THROWS_AS(SquareMat a(0),std::length_error);
     }
 
 }

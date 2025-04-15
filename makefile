@@ -1,3 +1,4 @@
+# baruh.ifraimov@gmail.com
 CXX = clang++
 CXXFLAGS = -Wall -std=c++17 -ggdb
 OBJ = ./obj/
@@ -12,28 +13,23 @@ Main: mmain
 test: mtest
 	./matxTest
 
-mmain: $(OBJ)main.o $(OBJ)matrixFunc.o $(OBJ)myMath.o
+mmain: $(OBJ)main.o $(OBJ)SquareMat.o
 	mkdir -p $(OBJ)
 	$(CXX) $(CXXFLAGS) $^ -o Main
 
-$(OBJ)main.o: $(SRC)main.cpp $(INC)matrixFunc.hpp $(INC)myMath.hpp
+$(OBJ)main.o: $(SRC)main.cpp $(INC)SquareMat.hpp
 	mkdir -p $(OBJ)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(OBJ)matrixFunc.o: $(SRC)matrixFunc.cpp $(INC)matrixFunc.hpp $(INC)myMath.hpp
+$(OBJ)SquareMat.o: $(SRC)SquareMat.cpp $(INC)SquareMat.hpp
 	mkdir -p $(OBJ)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(OBJ)myMath.o: $(SRC)myMath.cpp $(INC)myMath.hpp
+$(OBJ)matxTest.o: $(SRC)matxTest.cpp $(INC)doctest.h $(INC)SquareMat.hpp
 	mkdir -p $(OBJ)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# New testing rules
-$(OBJ)matxTest.o: $(SRC)matxTest.cpp $(INC)doctest.h $(INC)matrixFunc.hpp $(INC)myMath.hpp
-	mkdir -p $(OBJ)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-mtest: $(OBJ)matxTest.o $(OBJ)matrixFunc.o $(OBJ)myMath.o
+mtest: $(OBJ)matxTest.o $(OBJ)SquareMat.o
 	$(CXX) $(CXXFLAGS) $^ -o matxTest
 
 .PHONY: Main test valgrind clean all

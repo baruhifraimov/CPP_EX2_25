@@ -1,10 +1,25 @@
+// baruh.ifraimov@gmail.com
 #include <iostream>
 #include <stdexcept>
-#include "../inc/matrixFunc.hpp"
-#include "../inc/myMath.hpp"
+#include "../inc/SquareMat.hpp"
 
 namespace mtrx{
-	Matrix::Matrix(int size){
+
+	// Help function to sum any size of matrix
+	double matSum( const SquareMat& o){
+		int size = o.getSize();
+		double result=0;
+		for (int i = 0; i < size ; i++)
+		{
+			for (int j = 0; j < size; j++)
+		{
+			result+=(o[i][j]);
+		}
+		}
+		return result;
+	}
+
+	SquareMat::SquareMat(int size){
 		if(size <= 0){
 			throw(std::length_error("Negative (or zero) value will not be tolerated!"));
 		}
@@ -24,10 +39,15 @@ namespace mtrx{
 		}
 	}
 
-	Matrix::Matrix(double** matrix, int size){
+	SquareMat::SquareMat(double** matrix, int size){
 		if(size <= 0){
 			throw(std::length_error("Negative (or zero) value will not be tolerated!"));
 		}
+
+		if(matrix == nullptr || (*matrix) == nullptr){
+			throw(std::invalid_argument("Matrix is null"));
+		}
+
 		this->size = size;
 		mat_table = new double*[size];
 		for (int i = 0; i < size; i++)
@@ -37,6 +57,9 @@ namespace mtrx{
 
 		for (int i = 0; i < size; i++)
 		{
+			if (matrix[i] == nullptr) {
+				throw std::invalid_argument("Row pointer is null at index " + std::to_string(i));
+			}
 			for (int j = 0; j < size; j++)
 			{
 				mat_table[i][j] = matrix[i][j];
@@ -45,7 +68,7 @@ namespace mtrx{
 		
 	}
 
-	Matrix::Matrix(const Matrix & o){
+	SquareMat::SquareMat(const SquareMat & o){
 
 		this->size = o.size;
 		mat_table = new double*[size];
@@ -64,7 +87,7 @@ namespace mtrx{
 		
 	}
 
-	Matrix::~Matrix(){
+	SquareMat::~SquareMat(){
 		if(mat_table != nullptr){
 		for (int i = 0; i < this->size; i++)
 		{
@@ -75,8 +98,8 @@ namespace mtrx{
 	}
 
 	// ~m1 (Transpose)
-	Matrix Matrix::operator~(){
-		Matrix m(size);
+	SquareMat SquareMat::operator~(){
+		SquareMat m(size);
 		for (int i = 0; i < size; i++)
 		{
 			for (int j = 0; j < size; j++)
@@ -89,7 +112,7 @@ namespace mtrx{
 
 
 	// m1 = m2
-	Matrix& Matrix::operator=(const Matrix& o) {
+	SquareMat& SquareMat::operator=(const SquareMat& o) {
 		if (this == &o) {
 			return *this; // are we the same? then dont do nothing.
 		}
@@ -116,11 +139,11 @@ namespace mtrx{
 	}
 
 	// m1+m2
-	Matrix Matrix::operator+(const Matrix& o) const{
+	SquareMat SquareMat::operator+(const SquareMat& o) const{
 		if (this->size != o.size){
 			throw std::invalid_argument("Matrix sizes do not match");
 		}
-		Matrix m(size);
+		SquareMat m(size);
 		for (int i = 0; i < size; i++)
 		{
 			for (int j = 0; j < size; j++)
@@ -132,11 +155,11 @@ namespace mtrx{
 	}
 
 	// m1-m2
-	Matrix Matrix::operator-(const Matrix& o) const{
+	SquareMat SquareMat::operator-(const SquareMat& o) const{
 		if (this->size != o.size){
 			throw std::invalid_argument("Matrix sizes do not match");
 		}
-		Matrix m(size);
+		SquareMat m(size);
 		for (int i = 0; i < size; i++)
 		{
 			for (int j = 0; j < size; j++)
@@ -148,11 +171,11 @@ namespace mtrx{
 	}
 
 	// m1*m2
-	Matrix Matrix::operator*(const Matrix& o) const{
+	SquareMat SquareMat::operator*(const SquareMat& o) const{
 		if (this->size != o.size){
 			throw std::invalid_argument("Matrix sizes do not match");
 		}
-		Matrix m(size);
+		SquareMat m(size);
 		double curr_result =0;
 		for (int i = 0; i < size; i++)
 		{
@@ -170,11 +193,11 @@ namespace mtrx{
 	}
 
 	// m1%m2
-	Matrix Matrix::operator%(const Matrix& o) const{
+	SquareMat SquareMat::operator%(const SquareMat& o) const{
 		if (this->size != o.size){
 			throw std::invalid_argument("Matrix sizes do not match");
 		}
-		Matrix m(size);
+		SquareMat m(size);
 		for (int i = 0; i < size; i++)
 		{
 			for (int j = 0; j < size; j++)
@@ -186,8 +209,8 @@ namespace mtrx{
 	}
 
 	// -m1
-	Matrix Matrix::operator-(){
-		Matrix m(size);
+	SquareMat SquareMat::operator-(){
+		SquareMat m(size);
 		for (int i = 0; i < size; i++)
 		{
 			for (int j = 0; j < size; j++)
@@ -199,8 +222,8 @@ namespace mtrx{
 	}
 
 	// m1*<num>
-	Matrix Matrix::operator*(double num) const{
-		Matrix m(size);
+	SquareMat SquareMat::operator*(double num) const{
+		SquareMat m(size);
 		for (int i = 0; i < size; i++)
 		{
 			for (int j = 0; j < size; j++)
@@ -212,8 +235,8 @@ namespace mtrx{
 	}
 
 	// <num>*m1
-	Matrix operator*(double num, const Matrix& o){
-		Matrix m(o.size);
+	SquareMat operator*(double num, const SquareMat& o){
+		SquareMat m(o.size);
 		for (int i = 0; i < o.size; i++)
 		{
 			for (int j = 0; j < o.size; j++)
@@ -225,8 +248,8 @@ namespace mtrx{
 	}
 
 	// m1^<num>
-	Matrix Matrix::operator^(int num) const{
-		Matrix m(size);
+	SquareMat SquareMat::operator^(int num) const{
+		SquareMat m(size);
 		m = *this;
 		for (int i = 1; i < num; i++)
 		{
@@ -236,11 +259,11 @@ namespace mtrx{
 	}
 
 	// m1/<num>
-	Matrix Matrix::operator/(double num) const{
+	SquareMat SquareMat::operator/(double num) const{
 		if(num == 0){
 			throw "Can't divide by zero!";
 		}
-		Matrix m(size);
+		SquareMat m(size);
 		for (int i = 0; i < size; i++)
 		{
 			for (int j = 0; j < size; j++)
@@ -252,8 +275,8 @@ namespace mtrx{
 	}
 
 	// m1%<num>
-	Matrix Matrix::operator%(int num) const{
-		Matrix m(size);
+	SquareMat SquareMat::operator%(int num) const{
+		SquareMat m(size);
 		for (int i = 0; i < size; i++)
 		{
 			for (int j = 0; j < size; j++)
@@ -265,8 +288,8 @@ namespace mtrx{
 	}
 
 	// m1++
-	Matrix Matrix::operator++(int){
-		Matrix m = *this;
+	SquareMat SquareMat::operator++(int){
+		SquareMat m = *this;
 		for (int i = 0; i < size; i++)
 		{
 			for (int j = 0; j < size; j++)
@@ -278,7 +301,7 @@ namespace mtrx{
 	}
 
 	// ++m1
-	Matrix& Matrix::operator++(){
+	SquareMat& SquareMat::operator++(){
 		for (int i = 0; i < size; i++)
 		{
 			for (int j = 0; j < size; j++)
@@ -290,8 +313,8 @@ namespace mtrx{
 	}
 
 	// m1--
-	Matrix Matrix::operator--(int){
-		Matrix m = *this;
+	SquareMat SquareMat::operator--(int){
+		SquareMat m = *this;
 		for (int i = 0; i < size; i++)
 		{
 			for (int j = 0; j < size; j++)
@@ -303,7 +326,7 @@ namespace mtrx{
 	}
 
 	// --m1
-	Matrix& Matrix::operator--(){
+	SquareMat& SquareMat::operator--(){
 		for (int i = 0; i < size; i++)
 		{
 			for (int j = 0; j < size; j++)
@@ -314,8 +337,17 @@ namespace mtrx{
 		return *this;
 	}
 
+
+	// m1[] const
+	SquareMat::HiddenArr SquareMat::operator[](int index) const{
+		if (index < 0 || index >= size) {
+			throw std::out_of_range("Index is out of bounds");
+		}
+		return HiddenArr(mat_table[index], size);
+	}
+
 	// m1[]
-	Matrix::HiddenArr Matrix::operator[](int index){
+	SquareMat::HiddenArr SquareMat::operator[](int index){
 		if (index < 0 || index >= size) {
 			throw std::out_of_range("Index is out of bounds");
 		}
@@ -323,24 +355,15 @@ namespace mtrx{
 	}
 
 	// m1 == m2
-	bool Matrix::operator==(const Matrix& o) const{
-		if (this->size != o.size){
-			return false;
-		}
+	bool SquareMat::operator==(const SquareMat& o) const{
 		double result1=0,result2=0;
-		for (int i = 0; i < size; i++)
-		{
-			for (int j = 0; j < size; j++)
-		{
-			result1+=(this->mat_table[i][j]);
-			result2+=o.mat_table[i][j];
-		}
-		}
+		result1 = mtrx::matSum(*this);
+		result2 = mtrx::matSum(o);
 		return result1==result2;
 	}
 
 	// m1 != m2
-	bool Matrix::operator!=(const Matrix& o) const{
+	bool SquareMat::operator!=(const SquareMat& o) const{
 		if (this->size != o.size){
 			return true;
 		}
@@ -348,70 +371,34 @@ namespace mtrx{
 	}
 
 	// m1 < m2
-	bool Matrix::operator<(const Matrix& o) const{
-		if (this->size != o.size){
-			throw std::invalid_argument("Matrix sizes do not match");
-		}
+	bool SquareMat::operator<(const SquareMat& o) const{
 		double result1=0,result2=0;
-		for (int i = 0; i < size; i++)
-		{
-			for (int j = 0; j < size; j++)
-		{
-			result1+=(this->mat_table[i][j]);
-			result2+=o.mat_table[i][j];
-		}
-		}
+		result1 = mtrx::matSum(*this);
+		result2 = mtrx::matSum(o);
 		return result1 < result2;
 	}
 
 	// m1 > m2
-	bool Matrix::operator>(const Matrix& o) const{
-		if (this->size != o.size){
-			throw std::invalid_argument("Matrix sizes do not match");
-		}
+	bool SquareMat::operator>(const SquareMat& o) const{
 		double result1=0,result2=0;
-		for (int i = 0; i < size; i++)
-		{
-			for (int j = 0; j < size; j++)
-		{
-			result1+=(this->mat_table[i][j]);
-			result2+=o.mat_table[i][j];
-		}
-		}
+		result1 = mtrx::matSum(*this);
+		result2 = mtrx::matSum(o);
 		return result1 > result2;
 	}
 
 	// m1 <= m2
-	bool Matrix::operator<=(const Matrix& o) const{
-		if (this->size != o.size){
-			throw std::invalid_argument("Matrix sizes do not match");
-		}
+	bool SquareMat::operator<=(const SquareMat& o) const{
 		double result1=0,result2=0;
-		for (int i = 0; i < size; i++)
-		{
-			for (int j = 0; j < size; j++)
-		{
-			result1+=(this->mat_table[i][j]);
-			result2+=o.mat_table[i][j];
-		}
-		}
+		result1 = mtrx::matSum(*this);
+		result2 = mtrx::matSum(o);
 		return result1 <= result2;
 	}
 
 	// m1 >= m2
-	bool Matrix::operator>=(const Matrix& o) const{
-		if (this->size != o.size){
-			throw std::invalid_argument("Matrix sizes do not match");
-		}
+	bool SquareMat::operator>=(const SquareMat& o) const{
 		double result1=0,result2=0;
-		for (int i = 0; i < size; i++)
-		{
-			for (int j = 0; j < size; j++)
-		{
-			result1+=(this->mat_table[i][j]);
-			result2+=o.mat_table[i][j];
-		}
-		}
+		result1 = mtrx::matSum(*this);
+		result2 = mtrx::matSum(o);
 		return result1 >= result2;
 	}
 
@@ -465,7 +452,7 @@ namespace mtrx{
 		return det;
 	}
 
-	int Matrix::determinantHelper(double **mat, int n) const {
+	int SquareMat::determinantHelper(double **mat, int n) const {
 		// Base case for 1x1 matrix: the determinant is the single element.
 		if (n == 1)
 			return (int)mat[0][0];
@@ -515,12 +502,12 @@ namespace mtrx{
 	}
 
 	// !m1 (Determinant)
-	int Matrix::operator!() const {
+	int SquareMat::operator!() const {
 		return determinantHelper(this->mat_table, this->size);
 	}
 
 	// m1 += m2
-	Matrix& Matrix::operator+=(const Matrix& o){
+	SquareMat& SquareMat::operator+=(const SquareMat& o){
 		if (this->size != o.size){
 			throw std::invalid_argument("Matrix sizes do not match");
 		}
@@ -530,7 +517,7 @@ namespace mtrx{
 	}
 
 	// m1 -= m2
-	Matrix& Matrix::operator-=(const Matrix& o){
+	SquareMat& SquareMat::operator-=(const SquareMat& o){
 		if (this->size != o.size){
 			throw std::invalid_argument("Matrix sizes do not match");
 		}
@@ -539,15 +526,15 @@ namespace mtrx{
 		return *this;
 	}
 
-	// m1 /= m2
-	Matrix& Matrix::operator/=(double num){
+	// m1 /= num
+	SquareMat& SquareMat::operator/=(double num){
 		*this = (*this)/num;
 
 		return *this;
 	}
 
 	// m1 *= m2
-	Matrix& Matrix::operator*=(const Matrix& o){
+	SquareMat& SquareMat::operator*=(const SquareMat& o){
 		if (this->size != o.size){
 			throw std::invalid_argument("Matrix sizes do not match");
 		}
@@ -557,7 +544,7 @@ namespace mtrx{
 	}
 
 	// m1 %= m2
-	Matrix& Matrix::operator%=(const Matrix& o){
+	SquareMat& SquareMat::operator%=(const SquareMat& o){
 		if (this->size != o.size){
 			throw std::invalid_argument("Matrix sizes do not match");
 		}
@@ -567,7 +554,7 @@ namespace mtrx{
 	}
 	
 	// m1 *= num
-	Matrix& Matrix::operator*=(double num){
+	SquareMat& SquareMat::operator*=(double num){
 		
 		*this = *this * num;
 
@@ -575,14 +562,14 @@ namespace mtrx{
 	}
 
 	// m1 %= num
-	Matrix& Matrix::operator%=(double num){
+	SquareMat& SquareMat::operator%=(double num){
 		*this = *this % num;
 
 		return *this;
 	}
 
 	// cout << m1 
-	std::ostream& operator<<(std::ostream& os, const Matrix& o){
+	std::ostream& operator<<(std::ostream& os, const SquareMat& o){
 		int size = o.size;
 		for (int i = 0; i < size; i++)
 		{
