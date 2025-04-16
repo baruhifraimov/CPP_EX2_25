@@ -10,13 +10,13 @@ This project implements a square matrix class in C++ that supports various matri
 CPP_EX2_25/
 ├── inc/                 # Header files
 │   ├── SquareMat.hpp    # Matrix class declaration
-│   └── doctest.h        # Testing framework
-|	└── MatrixUtils.hpp		 # External utillities for Matrix class
+│   ├── doctest.h        # Testing framework
+|	  └── MatrixUtils.hpp		 # External utillities for Matrix class
 ├── src/                 # Implementation files
 │   ├── SquareMat.cpp    # Matrix class implementation
 │   ├── main.cpp         # Demo program
-│   └── matxTest.cpp     # Test suite
-|	└── MatrixUtils.cpp	 # External utillities for Matrix class
+│   ├── matxTest.cpp     # Test suite
+|	  └── MatrixUtils.cpp	 # External utillities for Matrix class
 ├── obj/                 # Compiled object files
 └── makefile             # Build configuration
 ```
@@ -33,6 +33,7 @@ The `SquareMat` class supports:
 - Increment/decrement operations (++, --)
 - Compound assignment operations (+=, -=, *=, etc.)
 
+The `MatrixUtils` file delivering swap function, extracted outside of SquareMat for OOP purposes and future extensibility 
 ## How to Build and Run
 
 The project includes a makefile with several targets:
