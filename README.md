@@ -11,10 +11,12 @@ CPP_EX2_25/
 ├── inc/                 # Header files
 │   ├── SquareMat.hpp    # Matrix class declaration
 │   └── doctest.h        # Testing framework
+|	└── MatrixUtils.hpp		 # External utillities for Matrix class
 ├── src/                 # Implementation files
 │   ├── SquareMat.cpp    # Matrix class implementation
 │   ├── main.cpp         # Demo program
 │   └── matxTest.cpp     # Test suite
+|	└── MatrixUtils.cpp	 # External utillities for Matrix class
 ├── obj/                 # Compiled object files
 └── makefile             # Build configuration
 ```

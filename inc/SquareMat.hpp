@@ -4,7 +4,8 @@
 
 namespace mtrx {
 	class SquareMat{
-		// Inner class for the array proxy, to implement the invalid access for the matrix
+		private:
+				// Inner class for the array proxy, to implement the invalid access for the matrix
 		// We will make it inline for the sake of clarity
 		class HiddenArr {
 			double* row;
@@ -26,9 +27,17 @@ namespace mtrx {
 				return row[index];
 			}
 		};
-		private:
 			double **mat_table;
 			int size;
+
+			/**
+			 * @brief Sum all the elements in the array
+			 * 
+			 * @param o The Matrix to be calculated
+			 * @return double 
+			 */
+			double matSum( const SquareMat& o) const;
+
 		public:
 			// Constructor 1
 			/**
@@ -72,12 +81,35 @@ namespace mtrx {
 			}
 
 			/**
-			 * @brief Sum all the elements in the array
+			 * @brief Get the Determinant of the matrix
 			 * 
-			 * @param o The Matrix to be calculated
-			 * @return double 
+			 * @return double - The determinant
 			 */
-			double matSum( const SquareMat& o);
+			double determinantHelper(double **mat, int n) const;
+
+			/**
+			 * @brief Calculates the adjoint (adjugate) of a matrix
+			 * 
+			 * @return SquareMat - The adjoint matrix
+			 */
+			SquareMat adjoint() const;
+
+			/**
+			 * @brief Calculates the determinant of a matrix
+			 * 
+			 * @param mat  Matrix to be calculated
+			 * @param n  Size of the matrix
+			 * @return double - The determinant
+			 */
+			void getCofactor(double** mat, double** temp, int p, int q, int n) const;
+
+			/**
+			 * @brief Calculates the determinant of a matrix
+			 * 
+			 * @return double - The determinant
+			 */
+			SquareMat inverse() const;
+
 			
 			/***************************************
 			 *           Operators Overload        *
@@ -88,7 +120,7 @@ namespace mtrx {
 			 * ~m1 (Transpose)
 			 * @return SquareMat 
 			 */
-			SquareMat operator~();
+			SquareMat operator~() const;
 
 			/**
 			 * @brief  Assign the matrix
@@ -281,7 +313,7 @@ namespace mtrx {
 			 * !m1 (Determinant)
 			 * @return int Determinant of the matrix
 			 */
-			int operator!() const;
+			double operator!() const;
 
 			/**
 			 * @brief  Add two matrices
@@ -347,8 +379,6 @@ namespace mtrx {
 			 * @return std::ostream&  
 			 */
 			friend std::ostream& operator<<(std::ostream& os, const SquareMat& o);
-			// Determinator ezer
-			int determinantHelper(double **mat, int n) const;
 
 			
 	};

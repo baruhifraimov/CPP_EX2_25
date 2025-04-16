@@ -13,7 +13,7 @@ Main: mmain
 test: mtest
 	./matxTest
 
-mmain: $(OBJ)main.o $(OBJ)SquareMat.o
+mmain: $(OBJ)main.o $(OBJ)SquareMat.o $(OBJ)MatrixUtils.o
 	mkdir -p $(OBJ)
 	$(CXX) $(CXXFLAGS) $^ -o Main
 
@@ -29,7 +29,11 @@ $(OBJ)matxTest.o: $(SRC)matxTest.cpp $(INC)doctest.h $(INC)SquareMat.hpp
 	mkdir -p $(OBJ)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-mtest: $(OBJ)matxTest.o $(OBJ)SquareMat.o
+$(OBJ)MatrixUtils.o: $(SRC)MatrixUtils.cpp $(INC)MatrixUtils.hpp
+	mkdir -p $(OBJ)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+mtest: $(OBJ)matxTest.o $(OBJ)SquareMat.o $(OBJ)MatrixUtils.o
 	$(CXX) $(CXXFLAGS) $^ -o matxTest
 
 .PHONY: Main test valgrind clean all

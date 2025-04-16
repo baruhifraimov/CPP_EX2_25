@@ -2,13 +2,14 @@
 #include <iostream>
 #include <stdexcept>
 #include "../inc/SquareMat.hpp"
-
+#include "../inc/MatrixUtils.hpp"
 namespace mtrx{
 
 	// Help function to sum any size of matrix
 	double matSum( const SquareMat& o){
 		int size = o.getSize();
 		double result=0;
+		// Loop through the matrix and sum all the elements
 		for (int i = 0; i < size ; i++)
 		{
 			for (int j = 0; j < size; j++)
@@ -98,13 +99,13 @@ namespace mtrx{
 	}
 
 	// ~m1 (Transpose)
-	SquareMat SquareMat::operator~(){
+	SquareMat SquareMat::operator~() const{
 		SquareMat m(size);
 		for (int i = 0; i < size; i++)
 		{
 			for (int j = 0; j < size; j++)
 		{
-			m.mat_table[i][j] = this->mat_table[j][i];
+			m.mat_table[i][j] = this->mat_table[j][i]; // Transpose
 		}
 		}
 		return m;
@@ -185,6 +186,13 @@ namespace mtrx{
 				{
 					curr_result += this->mat_table[i][t] * o.mat_table[t][j];
 				}
+				// Round to 0 if close to 0 (to avoid floating point errors)
+				if (curr_result < 0.0001 && curr_result > 0){
+					curr_result =0;
+				}
+				else if(curr_result > -0.0001 && curr_result < 0){
+					curr_result =0;
+				}
 				m.mat_table[i][j] = curr_result;
 				curr_result = 0;
 			}
@@ -229,6 +237,13 @@ namespace mtrx{
 			for (int j = 0; j < size; j++)
 		{
 			m.mat_table[i][j] = num*(this->mat_table[i][j]);
+				// Round to 0 if close to 0 (to avoid floating point errors)
+				if(m.mat_table[i][j] < 0.0001 && m.mat_table[i][j] > 0){
+				m.mat_table[i][j] =0;
+			}
+			else if(m.mat_table[i][j] > -0.0001 && m.mat_table[i][j] < 0){
+				m.mat_table[i][j] =0;
+			}
 		}
 		}
 		return m;
@@ -247,11 +262,99 @@ namespace mtrx{
 		return m;
 	}
 
+
+
+	/**
+	 * @brief Get cofactor of mat[p][q] in temp[][]. n is current size of mat[][]
+	 */
+	void SquareMat::getCofactor(double** mat, double** temp, int p, int q, int n) const {
+		int i = 0, j = 0;
+		
+		// Looping for each element of the matrix
+		for (int row = 0; row < n; row++) {
+			for (int col = 0; col < n; col++) {
+				if (row != p && col != q) {
+					temp[i][j++] = mat[row][col];
+					// Row is filled, so increase row index and reset col index
+					if (j == n - 1) {
+						j = 0;
+						i++;
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * @brief Calculates the adjoint (adjugate) of a matrix
+	 * 
+	 * @return SquareMat - The adjoint matrix
+	 */
+	SquareMat SquareMat::adjoint() const {
+		SquareMat adj(size);
+		// 1x1 matrix the adjoint is 1
+		if (size == 1) {
+			adj.mat_table[0][0] = 1;
+			return adj;
+		}
+		int sign;
+		// temp matrix for storing cofactors
+		double** temp = new double*[size-1];
+		for (int i = 0; i < size-1; i++) {
+			temp[i] = new double[size-1];
+		}
+		// Calculate the adjoint matrix
+		for (int i = 0; i < size; i++) {
+			for (int j = 0; j < size; j++) {
+				getCofactor(mat_table, temp, i, j, size);
+				sign = ((i + j) % 2 == 0) ? 1 : -1;
+				adj.mat_table[j][i] = sign * determinantHelper(temp, size-1);
+			}
+		}
+		for (int i = 0; i < size-1; i++) {
+			delete[] temp[i];
+		}
+		delete[] temp;
+		return adj;
+	}
+
+		/**
+	 * @brief Calculates the inverse of a matrix
+	 * 
+	 * @return SquareMat - The inverse matrix
+	 */
+	SquareMat SquareMat::inverse() const {
+		// compute determinant (operator! now returns double)
+		double det = !(*this);
+		if (det == 0.0) {
+			throw std::invalid_argument("Matrix is not invertible (determinant is zero)");
+		}
+	
+		// get adjugate (you already have adjoint())
+		SquareMat adj = this->adjoint();
+	
+		// scale each element by 1/det
+		double invDet = 1.0 / det;
+		adj *= invDet;
+	
+		return adj;
+	}
+
 	// m1^<num>
 	SquareMat SquareMat::operator^(int num) const{
 		SquareMat m(size);
 		m = *this;
-		if(num == 0){
+
+		if(num <0){
+			m = m.inverse();
+			SquareMat copyM = m;
+			for (int i = 1; i < -num; i++)
+			{
+				m*=copyM;
+			}
+		}
+
+		else if(num == 0){
 			for (int i = 0; i < size; i++)
 			{
 					for (int j = 0; j < size; j++)
@@ -267,19 +370,21 @@ namespace mtrx{
 				}
 			}
 		}
+
 		else{
 		for (int i = 1; i < num; i++)
 		{
-			m*=m;
+			m*=(*this);
 		}
 	}
+
 		return m;
 	}
 
 	// m1/<num>
 	SquareMat SquareMat::operator/(double num) const{
 		if(num == 0){
-			throw "Can't divide by zero!";
+			throw std::invalid_argument("Can't divide by zero!");
 		}
 		SquareMat m(size);
 		for (int i = 0; i < size; i++)
@@ -420,109 +525,41 @@ namespace mtrx{
 		return result1 >= result2;
 	}
 
-		// This function uses recursive cofactor expansion.
-	int determinantHelper(double **mat, int n) {
-		// Base case for 1x1 matrix: the determinant is the single element.
-		if (n == 1)
-			return (int)mat[0][0];
-
-		// Base case for 2x2 matrix: use the formula: det = ad - bc.
-		if (n == 2)
-			return (int)(mat[0][0] * mat[1][1] - mat[0][1] * mat[1][0]);
-
-		int det = 0;
-		int sign = 1;  // Sign multiplier, alternating between 1 and -1.
-
-		// Allocate memory for a temporary submatrix of size (n-1) x (n-1)
-		double **temp = new double*[n - 1];
-		for (int i = 0; i < n - 1; i++) {
-			temp[i] = new double[n - 1];
-		}
-
-		// Cofactor expansion along the first row.
-		for (int col = 0; col < n; col++) {
-			// Build the submatrix by skipping the first row and the current column 'col'.
-			int subi = 0; // Submatrix row index.
-			for (int i = 1; i < n; i++) {
-				int subj = 0; // Submatrix column index.
-				for (int j = 0; j < n; j++) {
-					if (j == col)
-						continue;  // Skip the column used for cofactor expansion.
-					temp[subi][subj] = mat[i][j];
-					subj++;
-				}
-				subi++;
+	double SquareMat::determinantHelper(double** mat, int n) const {
+		if (n == 1) // base case
+			return mat[0][0];
+		if (n == 2) // base case
+			return mat[0][0]*mat[1][1] - mat[0][1]*mat[1][0];
+	  
+		double det = 0, sign = 1;
+		double** temp = new double*[n-1];
+		for(int i=0;i<n-1;i++) temp[i] = new double[n-1];
+	  
+		for(int col=0; col<n; col++){
+		  // build submatrix
+		  int subi = 0;
+		  for(int i=1;i<n;i++){
+			int subj=0;
+			for(int j=0;j<n;j++){
+			  if(j==col) continue;
+			  temp[subi][subj++] = mat[i][j];
 			}
-			// Recursively calculate the determinant of the submatrix.
-			int subDet = determinantHelper(temp, n - 1);
-			// Add the term for the current column: element * subDet * sign.
-			det += sign * (int)mat[0][col] * subDet;
-			// Alternate the sign for the next term.
-			sign = -sign;
+			subi++;
+		  }
+		  det += sign * mat[0][col] * determinantHelper(temp, n-1);
+		  sign = -sign;
 		}
-
-		// Free the memory allocated for the temporary submatrix.
-		for (int i = 0; i < n - 1; i++) {
-			delete [] temp[i];
-		}
-		delete [] temp;
-
+	  
+		for(int i=0;i<n-1;i++) delete[] temp[i];
+		delete[] temp;
 		return det;
-	}
-
-	int SquareMat::determinantHelper(double **mat, int n) const {
-		// Base case for 1x1 matrix: the determinant is the single element.
-		if (n == 1)
-			return (int)mat[0][0];
-	
-		// Base case for 2x2 matrix: use the formula: det = ad - bc.
-		if (n == 2)
-			return (int)(mat[0][0] * mat[1][1] - mat[0][1] * mat[1][0]);
-	
-		int det = 0;
-		int sign = 1;  // Sign multiplier, alternating between 1 and -1.
-	
-		// Allocate memory for a temporary submatrix of size (n-1) x (n-1)
-		double **temp = new double*[n - 1];
-		for (int i = 0; i < n - 1; i++) {
-			temp[i] = new double[n - 1];
-		}
-	
-		// Cofactor expansion along the first row.
-		for (int col = 0; col < n; col++) {
-			// Build the submatrix by skipping the first row and the current column 'col'.
-			int subi = 0; // Submatrix row index.
-			for (int i = 1; i < n; i++) {
-				int subj = 0; // Submatrix column index.
-				for (int j = 0; j < n; j++) {
-					if (j == col)
-						continue;  // Skip the column used for cofactor expansion.
-					temp[subi][subj] = mat[i][j];
-					subj++;
-				}
-				subi++;
-			}
-			// Recursively calculate the determinant of the submatrix.
-			int subDet = determinantHelper(temp, n - 1);
-			// Add the term for the current column: element * subDet * sign.
-			det += sign * (int)mat[0][col] * subDet;
-			// Alternate the sign for the next term.
-			sign = -sign;
-		}
-	
-		// Free the memory allocated for the temporary submatrix.
-		for (int i = 0; i < n - 1; i++) {
-			delete [] temp[i];
-		}
-		delete [] temp;
-	
-		return det;
-	}
+	  }
+	  
 
 	// !m1 (Determinant)
-	int SquareMat::operator!() const {
-		return determinantHelper(this->mat_table, this->size);
-	}
+	double SquareMat::operator!() const {
+		return determinantHelper(mat_table, size);
+	  }
 
 	// m1 += m2
 	SquareMat& SquareMat::operator+=(const SquareMat& o){

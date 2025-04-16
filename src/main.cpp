@@ -129,6 +129,10 @@ int main() {
 
     std::cout << "A^0:\n" << (A^0) << std::endl;
 
+    std::cout << "A^-1:\n" << (A^-1) << std::endl;
+
+    std::cout << "A^-1 * A :\n" << (A^-1)*A << std::endl;
+    
     free_SquareMat(m1, 2);
     free_SquareMat(m2, 2);
     free_SquareMat(m3, 3);

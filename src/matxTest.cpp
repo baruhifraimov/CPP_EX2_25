@@ -2,6 +2,7 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "../inc/doctest.h"
 #include "../inc/SquareMat.hpp"
+#include "../inc/MatrixUtils.hpp"
 #include <iostream>
 
 using namespace mtrx;
@@ -378,7 +379,7 @@ TEST_CASE("SquareMat Class Tests") {
     SUBCASE(" Scalar Division - Exception (m1 /= 0)") {
         SquareMat a = m1;
         
-        CHECK_THROWS(a /= 0);
+        CHECK_THROWS_AS(a /= 0, std::invalid_argument);
     }
 
     SUBCASE(" Modulo with SquareMat (m1 %= m2)") {
@@ -422,4 +423,20 @@ TEST_CASE("SquareMat Class Tests") {
         CHECK_THROWS_AS(SquareMat a(0),std::length_error);
     }
 
+    SUBCASE("Try to inverse a ireverseable matrix"){
+        SquareMat singular(2);
+        singular[0][0] = 1;  singular[0][1] = 2;
+        singular[1][0] = 2;  singular[1][1] = 4; // det == 0
+        CHECK_THROWS_AS(singular.inverse(), std::invalid_argument);
+        CHECK_THROWS_AS(singular ^ -1,    std::invalid_argument);
+    }
+
+}
+TEST_CASE("Matrix Utility Functions") {
+    // Test the swap function
+    double a = 5.0;
+    double b = 10.0;
+    swap(a, b);
+    CHECK(a == 10.0);
+    CHECK(b == 5.0);
 }
