@@ -158,6 +158,25 @@ TEST_CASE("SquareMat Class Tests") {
         CHECK(doctest::Approx(result[1][1]) == (double)529/100);
     }
 
+    SUBCASE("Power SquareMat (multiply it by num times) (m2^0))"){
+        SquareMat result1 = m2^0;
+        // should be matrix YEHIDA
+        SquareMat result2 = m3^0;
+        CHECK(doctest::Approx(result1[0][0]) == 1);
+        CHECK(doctest::Approx(result1[0][1]) == 0);
+        CHECK(doctest::Approx(result1[1][0]) == 0);
+        CHECK(doctest::Approx(result1[1][1]) == 1);
+        CHECK(doctest::Approx(result2[0][0]) == 1);
+        CHECK(doctest::Approx(result2[0][1]) == 0);
+        CHECK(doctest::Approx(result2[0][2]) == 0);
+        CHECK(doctest::Approx(result2[1][0]) == 0);
+        CHECK(doctest::Approx(result2[1][1]) == 1);
+        CHECK(doctest::Approx(result2[1][2]) == 0);
+        CHECK(doctest::Approx(result2[2][0]) == 0);
+        CHECK(doctest::Approx(result2[2][1]) == 0);
+        CHECK(doctest::Approx(result2[2][2]) == 1);
+    }
+
     SUBCASE("Greater than or equal (m1 >= m2)") {
         SquareMat a(2);
         a[0][0] = 5; a[0][1] = 5;

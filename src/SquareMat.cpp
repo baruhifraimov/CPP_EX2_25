@@ -251,10 +251,28 @@ namespace mtrx{
 	SquareMat SquareMat::operator^(int num) const{
 		SquareMat m(size);
 		m = *this;
+		if(num == 0){
+			for (int i = 0; i < size; i++)
+			{
+					for (int j = 0; j < size; j++)
+				{
+					if(i == j)
+					{
+						m.mat_table[i][j] = 1;
+					}
+					else
+					{
+					m.mat_table[i][j] = 0;
+					}
+				}
+			}
+		}
+		else{
 		for (int i = 1; i < num; i++)
 		{
 			m*=m;
 		}
+	}
 		return m;
 	}
 

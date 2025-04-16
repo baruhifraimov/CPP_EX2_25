@@ -127,6 +127,8 @@ int main() {
 
     std::cout << "A^2:\n" << (A^2) << std::endl;
 
+    std::cout << "A^0:\n" << (A^0) << std::endl;
+
     free_SquareMat(m1, 2);
     free_SquareMat(m2, 2);
     free_SquareMat(m3, 3);
