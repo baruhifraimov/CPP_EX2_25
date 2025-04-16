@@ -57,7 +57,3 @@ Used the doctest framework to create a comprehensive test suite that verifies:
 - All operators work correctly
 - Edge cases are handled properly
 - Exceptions are thrown when expected (invalid dimensions, out-of-bounds access)
-
-## Conclusion
-
-This project demonstrates my understanding of C++ object-oriented programming, operator overloading, and memory management. The SquareMat class provides a useful foundation for applications requiring matrix operations.
